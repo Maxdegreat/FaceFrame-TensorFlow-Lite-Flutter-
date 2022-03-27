@@ -51,7 +51,7 @@ class _StaticViewState extends State<StaticView> {
   @override
   void dispose() {
     super.dispose();
-    // should dispose the player
+    // should dispose the playerr
     audioPlayer!.dispose();
   }
 
