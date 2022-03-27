@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:faceframe/signToSpeach/sign_to_speach_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:tflite/tflite.dart';
 
@@ -25,11 +26,13 @@ class _LiveViewState extends State<LiveView> {
   List regoginitions = [];
   // string output will be used to tell if it is a thumbs up or down
   String output = "";
+  // controller used for sign to sound
+  SignToSound signToSound = SignToSound();
   // a functin that handels the initilization of the cameras
   loadCameras() async {
     print("in the loadCameras fnction");
     var cameras_ = await availableCameras();
-    var controller_ = CameraController(cameras_[0], ResolutionPreset.max);
+    var controller_ = CameraController(cameras_[0], ResolutionPreset.medium); // -----------> quality
     controller_.initialize().then((_) {
       if (!mounted) {
         return - 1;
@@ -65,7 +68,12 @@ class _LiveViewState extends State<LiveView> {
         regoginitions = temp_recognitions!;
       });
 
-      regoginitions.forEach((element) {  setState(() { output = element['label'];  });
+      regoginitions.forEach((element) {
+        setState(() { output = element['label'];
+        output = output.substring(2);
+        
+
+      });
 
     });
     } else {
@@ -74,13 +82,21 @@ class _LiveViewState extends State<LiveView> {
     }
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void showInSnackBar(String message) {
+    // ignore: deprecated_member_use
+    _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
+  }
+
 
 
    @override
      initState()  {
      super.initState();
      loadCameras();
-     print("once out the camera is ${cameras} and controller is $controller");
+     //signToSound.init();
+    
      setState(() {});
    }
 
@@ -88,6 +104,7 @@ class _LiveViewState extends State<LiveView> {
   void dispose() {
     controller?.dispose();
     super.dispose();
+    //signToSound.dispose();
   }
 
   @override
@@ -95,12 +112,12 @@ class _LiveViewState extends State<LiveView> {
     Size size = MediaQuery.of(context).size;
     if (controller != null) {
       if (!controller!.value.isInitialized) {
-        print("controller not initalized MAXXXXXXXXXXXXXXXXX");
         return contorllerNullAlert();
       }  
     }
     return Scaffold(
       body: Stack(
+        
         children: [
           Container(
             color: Colors.green,
@@ -109,12 +126,35 @@ class _LiveViewState extends State<LiveView> {
           child: CameraPreview(controller!),
           ),
           Positioned(
-            bottom: 80,
+            bottom: 100,
             left: 0,
             child: buildTextBackground(context),
+          ),
+          Positioned(
+            bottom: 50,
+            right: 50,
+            child: ToSpeachBtn(),
           )
         ],
       ),
+    );
+  }
+
+  Container ToSpeachBtn() {
+    return Container(
+      child: ElevatedButton(
+        onPressed: () async { 
+          var x;
+          try {
+            //x = await signToSound.playAudio(toPlay: output);            
+          
+          } catch (e) {
+            ScaffoldMessenger(child: x);
+          } 
+
+        },
+        child: Text("To Speach"),
+      )
     );
   }
 
@@ -142,7 +182,7 @@ class contorllerNullAlert extends StatelessWidget {
     return Container(
       height: 120,
       width: 150,
-      child: Center(child: Text("controller is null max... or None in python")),
+      child: Center(child: Text("controller is null max... or None in python lol idccccccccc")),
     );
   }
 }

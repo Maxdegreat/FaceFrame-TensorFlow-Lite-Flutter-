@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.faceframe">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="faceframe"
         android:name="io.flutter.app.FlutterApplication"
